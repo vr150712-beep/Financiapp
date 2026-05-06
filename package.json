@@ -11,8 +11,8 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@fontsource-variable/bricolage-grotesque": "^5.2.10",
-    "@fontsource/dm-mono": "^5.2.7",
+    "@fontsource-variable/bricolage-grotesque": "^5.0.0",
+    "@fontsource/dm-mono": "^5.0.0",
     "@fontsource/inter": "^5.0.8",
     "@tanstack/react-router": "^1.114.0",
     "lucide-react": "^0.511.0",
