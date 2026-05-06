@@ -1,0 +1,32 @@
+# Dependencias
+node_modules/
+.pnp
+.pnp.js
+
+# Logs de Claude y del sistema (específicos de tu carpeta)
+*.log
+CLAUDE.md
+CLAUDE_CODE_PROMPT.md
+bashrc.log
+env.log
+env2.log
+npm-install.log
+npm-install2.log
+nodeinfo.txt
+
+# Herramientas de desarrollo y entorno
+.claude/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Salida de compilación (Vite)
+dist/
+dist-ssr/
+*.local
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db

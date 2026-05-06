@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/* ─── Tailwind v4 Theme Tokens ───────────────────────────────── */
+@theme {
+  --radius-input:  8px;
+  --radius-card:   12px;
+  --radius-sheet:  16px;
+  --radius-pill:   9999px;
+  --font-family-sans: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-family-mono: 'DM Mono', 'Geist Mono', ui-monospace, monospace;
+}
+
+/* ─── Design Tokens ─────────────────────────────────────────── */
+:root {
+  /* Backgrounds — warm obsidian, elevation via color */
+  --bg0: #0F0E0C;
+  --s1:  #1D1C1A;
+  --s2:  #262523;
+  --s3:  #312F2D;
+
+  /* Text */
+  --t1: #F5F5F3;
+  --t2: #8A8A88;
+  --t3: #5A5855;
+
+  /* Borders */
+  --border: 0.5px solid #312F2D;
+
+  /* Semantic accents */
+  --emerald:     #1D9E75;
+  --emerald-dim: rgba(29,158,117,0.12);
+  --emerald-t:   #4ECDA4;
+
+  --amber:       #BA7517;
+  --amber-dim:   rgba(186,117,23,0.12);
+  --amber-t:     #F0A830;
+
+  --coral:       #D85A30;
+  --coral-dim:   rgba(216,90,48,0.12);
+  --coral-t:     #F07050;
+
+  /* Identity */
+  --blue:        #378ADD;
+  --blue-dim:    rgba(55,138,221,0.12);
+  --blue-t:      #6AAEE8;
+
+  --pink:        #D4537E;
+  --pink-dim:    rgba(212,83,126,0.12);
+  --pink-t:      #E880A8;
+
+  /* Category palette — muted, works on dark bg */
+  --cat-vivienda:        #5B9BD5;
+  --cat-alimentacion:    #4BAE82;
+  --cat-transporte:      #C49538;
+  --cat-salud:           #C45E8F;
+  --cat-entretenimiento: #8B67C4;
+  --cat-suscripciones:   #3BA8BE;
+  --cat-otros:           #787876;
+
+  /* Radius */
+  --r-input:  8px;
+  --r-card:   12px;
+  --r-sheet:  16px;
+  --r-pill:   999px;
+}
+
+/* ─── Base ───────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg0);
+  color: var(--t1);
+  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── App Shell — 390px mobile centered ─────────────────────── */
+.app-shell {
+  width: 100%;
+  max-width: 390px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  background-color: var(--bg0);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ─── Typography — UI copy ───────────────────────────────────── */
+.text-base-ui { font-size: 15px; font-weight: 400; letter-spacing: -0.01em; }
+.text-sm-ui   { font-size: 13px; font-weight: 400; letter-spacing: -0.01em; }
+.text-xs-ui   { font-size: 11px; font-weight: 400; }
+.label { font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.09em; }
+
+/* ─── Typography — financial figures (DM Mono) ───────────────── */
+.num-hero {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 40px; font-weight: 400; letter-spacing: -0.03em; line-height: 1;
+}
+.num-xl {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 28px; font-weight: 400; letter-spacing: -0.03em; line-height: 1;
+}
+.num-lg {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 22px; font-weight: 400; letter-spacing: -0.02em; line-height: 1;
+}
+.num-md {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 15px; font-weight: 400; letter-spacing: -0.01em; line-height: 1;
+}
+.num-sm {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 12px; font-weight: 400; letter-spacing: 0; line-height: 1;
+}
+
+/* ─── Interaction States ─────────────────────────────────────── */
+.btn-press {
+  transition: transform 100ms ease-out, opacity 100ms ease-out;
+}
+.btn-press:active {
+  transform: scale(0.97);
+  opacity: 0.8;
+}
+
+*:focus-visible {
+  outline: 1.5px solid var(--emerald);
+  outline-offset: 2px;
+}
+
+[disabled], [aria-disabled="true"] {
+  opacity: 0.35;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* ─── Scrollbar — hide on mobile ────────────────────────────── */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; }
