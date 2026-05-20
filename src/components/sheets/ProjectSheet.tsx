@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Drawer } from 'vaul'
 import { toast } from 'sonner'
 import { X } from 'lucide-react'
 import { useProjectsStore } from '@/store'
-import { useSplitRatio } from '@/hooks'
+import { useSplitRatio, useKeyboardHeight } from '@/hooks'
 import { ProjectSchema } from '@/core'
 import { formatCOP } from '@/lib/format'
 
@@ -20,6 +20,12 @@ export function ProjectSheet({ open, onClose }: ProjectSheetProps) {
 
   const addProject = useProjectsStore((s) => s.addProject)
   const { victorRatio, partnerRatio } = useSplitRatio()
+  const kbH = useKeyboardHeight()
+
+  const scrollOnFocus = useCallback((e: { currentTarget: HTMLInputElement }) => {
+    const el = e.currentTarget
+    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 320)
+  }, [])
 
   const numAmount = parseFloat(amount) || 0
   const numMonths = parseInt(months)   || 0
@@ -58,10 +64,13 @@ export function ProjectSheet({ open, onClose }: ProjectSheetProps) {
     <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()}>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/55 z-40" />
-        <Drawer.Content className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-[var(--s1)] rounded-sheet rounded-b-none outline-none">
+        <Drawer.Content
+          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-[var(--s1)] rounded-sheet rounded-b-none outline-none"
+          style={{ bottom: kbH, transition: 'bottom 0.25s ease-out' }}
+        >
           <div className="w-8 h-[3px] bg-[var(--s3)] rounded-full mx-auto mt-2.5 mb-1" />
 
-          <div className="px-4 pb-8">
+          <div className="px-4 pb-8 overflow-y-auto" style={{ maxHeight: `calc(88dvh - ${kbH}px)` }}>
             <div className="flex items-center justify-between py-3">
               <h2 className="text-base-ui font-semibold text-[var(--t1)]">Nuevo proyecto</h2>
               <button onClick={onClose} className="text-[var(--t3)]"><X size={20} strokeWidth={1.5} /></button>
@@ -75,6 +84,7 @@ export function ProjectSheet({ open, onClose }: ProjectSheetProps) {
                   placeholder="Ej. Viaje a Europa"
                   value={label}
                   onChange={(e) => { setLabel(e.target.value); setErrors((er) => ({ ...er, label: '' })) }}
+                  onFocus={scrollOnFocus}
                   className="w-full bg-[var(--s2)] border border-[var(--s3)] rounded-input px-3 py-3 text-sm-ui text-[var(--t1)] placeholder:text-[var(--t3)] focus:outline-none focus:ring-[1.5px] focus:ring-[var(--emerald)]"
                 />
                 {errors.label && <p className="text-xs-ui text-[var(--coral-t)] mt-1">{errors.label}</p>}
@@ -90,6 +100,7 @@ export function ProjectSheet({ open, onClose }: ProjectSheetProps) {
                     placeholder="0"
                     value={amount}
                     onChange={(e) => { setAmount(e.target.value.replace(/[^0-9.]/g, '')); setErrors((er) => ({ ...er, amount: '' })) }}
+                    onFocus={scrollOnFocus}
                     className="w-full bg-[var(--s2)] border border-[var(--s3)] rounded-input pl-7 pr-3 py-3 text-sm-ui text-[var(--t1)] placeholder:text-[var(--t3)] focus:outline-none focus:ring-[1.5px] focus:ring-[var(--emerald)]"
                   />
                 </div>
@@ -104,6 +115,7 @@ export function ProjectSheet({ open, onClose }: ProjectSheetProps) {
                   placeholder="12"
                   value={months}
                   onChange={(e) => { setMonths(e.target.value.replace(/[^0-9]/g, '')); setErrors((er) => ({ ...er, months: '' })) }}
+                  onFocus={scrollOnFocus}
                   className="w-full bg-[var(--s2)] border border-[var(--s3)] rounded-input px-3 py-3 text-sm-ui text-[var(--t1)] placeholder:text-[var(--t3)] focus:outline-none focus:ring-[1.5px] focus:ring-[var(--emerald)]"
                 />
                 {errors.months && <p className="text-xs-ui text-[var(--coral-t)] mt-1">{errors.months}</p>}
