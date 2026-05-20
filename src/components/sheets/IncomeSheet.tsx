@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Drawer } from 'vaul'
 import { toast } from 'sonner'
-import { X, Trash2, Plus, ChevronDown, ChevronUp } from 'lucide-react'
+import { X, Trash2, Plus, ChevronUp } from 'lucide-react'
 import { useProfilesStore } from '@/store'
 import { selectProfileIncome } from '@/store'
 import { IncomeSourceSchema } from '@/core'
-import { formatCOP, formatInputCOP, parseInputCOP } from '@/lib/format'
+import { formatCOP, parseInputCOP } from '@/lib/format'
+import { useKeyboardHeight } from '@/hooks'
 import type { ProfileId } from '@/core'
 
 interface IncomeSheetProps {
@@ -27,6 +28,7 @@ export function IncomeSheet({ open, onClose }: IncomeSheetProps) {
   const profiles    = useProfilesStore((s) => s.profiles)
   const addSource   = useProfilesStore((s) => s.addIncomeSource)
   const removeSource= useProfilesStore((s) => s.removeIncomeSource)
+  const kbH         = useKeyboardHeight()
 
   const [forms, setForms] = useState<Record<ProfileId, PersonFormState>>({
     victor:  { ...EMPTY_FORM },
@@ -71,11 +73,14 @@ export function IncomeSheet({ open, onClose }: IncomeSheetProps) {
     <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()}>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/55 z-40" />
-        <Drawer.Content className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-[var(--s1)] rounded-t-[16px] outline-none">
+        <Drawer.Content
+          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-[var(--s1)] rounded-t-[16px] outline-none"
+          style={{ bottom: kbH, transition: 'bottom 0.25s ease-out' }}
+        >
           {/* Handle */}
           <div className="w-8 h-[3px] bg-[var(--s3)] rounded-full mx-auto mt-2.5 mb-1" />
 
-          <div className="px-4 pb-8 overflow-y-auto max-h-[88dvh]">
+          <div className="px-4 pb-8 overflow-y-auto" style={{ maxHeight: `calc(88dvh - ${kbH}px)` }}>
             {/* Header */}
             <div className="flex items-center justify-between py-3 mb-1">
               <div>
