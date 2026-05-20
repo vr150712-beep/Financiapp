@@ -11,8 +11,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Finanzas',
-        short_name: 'Finanzas',
+        name: 'Financiapp',
+        short_name: 'Financiapp',
         description: 'Finanzas personales y de pareja',
         theme_color: '#0C0C0B',
         background_color: '#0C0C0B',
