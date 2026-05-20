@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Drawer } from 'vaul'
 import { toast } from 'sonner'
 import { X, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react'
 import { useExpensesStore, useProfilesStore } from '@/store'
-import { useSplitRatio } from '@/hooks'
+import { useSplitRatio, useKeyboardHeight } from '@/hooks'
 import { CATEGORIES, ExpenseSchema, type Category, type ProfileId } from '@/core'
 import { calcSuggestedPart } from '@/core'
 import { formatCOP, formatInputCOP, parseInputCOP } from '@/lib/format'
@@ -45,6 +45,7 @@ export function ExpenseSheet({
   const profiles      = useProfilesStore((s) => s.profiles)
 
   const { victorRatio, partnerRatio } = useSplitRatio()
+  const kbH = useKeyboardHeight()
   const effectiveOwner = isEditing ? editingExpense.ownerId : ownerId
   const ratio          = effectiveOwner === 'victor' ? victorRatio : partnerRatio
 
@@ -137,15 +138,24 @@ export function ExpenseSheet({
 
   const ownerProfile = profiles[effectiveOwner]
 
+  // Scroll focused input into view once keyboard finishes animating
+  const scrollOnFocus = useCallback((e: { currentTarget: HTMLInputElement }) => {
+    const el = e.currentTarget
+    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 320)
+  }, [])
+
   return (
     <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()}>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/55 z-40" />
-        <Drawer.Content className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-[var(--s1)] rounded-t-[16px] outline-none">
+        <Drawer.Content
+          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-[var(--s1)] rounded-t-[16px] outline-none"
+          style={{ bottom: kbH, transition: 'bottom 0.25s ease-out' }}
+        >
           {/* Handle */}
           <div className="w-8 h-[3px] bg-[var(--s3)] rounded-full mx-auto mt-2.5 mb-1" />
 
-          <div className="px-4 pb-8 overflow-y-auto max-h-[92dvh]">
+          <div className="px-4 pb-8 overflow-y-auto" style={{ maxHeight: `calc(92dvh - ${kbH}px)` }}>
             {/* Header */}
             <div className="flex items-center justify-between py-3">
               <div className="flex items-center gap-2">
@@ -174,6 +184,7 @@ export function ExpenseSheet({
                   placeholder="0"
                   value={amountDisplay}
                   onChange={(e) => handleAmountChange(e.target.value)}
+                  onFocus={scrollOnFocus}
                   className="bg-transparent num-xl text-[var(--t1)] w-full focus:outline-none placeholder:text-[var(--s3)]"
                 />
               </div>
@@ -223,6 +234,7 @@ export function ExpenseSheet({
                 placeholder="Ej. Arriendo, Mercado…"
                 value={label}
                 onChange={(e) => { setLabel(e.target.value); setErrors((er) => ({ ...er, label: '' })) }}
+                onFocus={scrollOnFocus}
                 className="w-full bg-[var(--s2)] border border-[var(--s3)] rounded-lg px-3 py-3 text-sm-ui text-[var(--t1)] placeholder:text-[var(--t3)] focus:outline-none focus:ring-[1.5px] focus:ring-[var(--emerald)]"
               />
               {errors.label && <p className="text-xs-ui text-[var(--coral-t)] mt-1">{errors.label}</p>}
@@ -260,6 +272,7 @@ export function ExpenseSheet({
                     placeholder="0"
                     value={myPartDisplay}
                     onChange={(e) => handleMyPartChange(e.target.value)}
+                    onFocus={scrollOnFocus}
                     disabled={numAmount === 0}
                     className="bg-transparent text-sm-ui text-[var(--t1)] w-full focus:outline-none placeholder:text-[var(--t3)]"
                   />
