@@ -20,15 +20,13 @@ export function calcWellness(
   expenses: Expense[],
   targetSavings: number,
 ): WellnessResult {
-  const mine = expenses.filter(e => e.ownerId === profileId)
-
-  const personalBurden = mine
-    .filter(e => !e.shared)
+  const personalBurden = expenses
+    .filter(e => e.ownerId === profileId && !e.shared)
     .reduce((sum, e) => sum + e.amount, 0)
 
-  const sharedBurden = mine
+  const sharedBurden = expenses
     .filter(e => e.shared)
-    .reduce((sum, e) => sum + e.myPart, 0)
+    .reduce((sum, e) => sum + (e.ownerId === profileId ? e.myPart : e.otherPart), 0)
 
   const totalBurden = personalBurden + sharedBurden
   const remaining   = income - totalBurden

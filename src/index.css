@@ -1,6 +1,7 @@
-@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/fraunces";
 @import "@fontsource/dm-mono";
 @import "@fontsource/dm-mono/500.css";
+@import "@fontsource/inter";
 @import "tailwindcss";
 
 /* ─── Tailwind v4 Theme Tokens ───────────────────────────────── */
@@ -9,56 +10,74 @@
   --radius-card:   12px;
   --radius-sheet:  16px;
   --radius-pill:   9999px;
-  --font-family-sans: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-family-sans: 'Inter', system-ui, sans-serif;
   --font-family-mono: 'DM Mono', 'Geist Mono', ui-monospace, monospace;
 }
 
-/* ─── Design Tokens ─────────────────────────────────────────── */
+/* ─── Design Tokens — light redesign ─────────────────────────── */
 :root {
-  /* Backgrounds — warm obsidian, elevation via color */
-  --bg0: #0F0E0C;
-  --s1:  #1D1C1A;
-  --s2:  #262523;
-  --s3:  #312F2D;
+  /* Backgrounds */
+  --bg0: #F5F4F1;
+  --s1:  #FFFFFF;
+  --s2:  #F0EFEB;
+  --s3:  #E5E3DC;
+
+  /* Hero card (Bienestar financiero) — stays dark by design, regardless of theme */
+  --hero-bg:      #16160F;
+  --hero-track:   #2E2E2C;
+  --hero-divider: rgba(255, 255, 255, 0.1);
+  --hero-t1:      #F5F5F3;
+  --hero-t2:      #9A9A93;
 
   /* Text */
-  --t1: #F5F5F3;
-  --t2: #8A8A88;
-  --t3: #5A5855;
+  --t1: #16160F;
+  --t2: #6B6A63;
+  --t3: #A8A6A0;
 
   /* Borders */
-  --border: 0.5px solid #312F2D;
+  --border: 0.5px solid rgba(20, 20, 15, 0.08);
+  --border-soft: rgba(20, 20, 15, 0.06);
 
-  /* Semantic accents */
+  /* Card shadow */
+  --shadow-card: 0 1px 2px rgba(20, 20, 15, 0.04), 0 4px 12px rgba(20, 20, 15, 0.05);
+
+  /* Semantic accents (status) */
   --emerald:     #1D9E75;
-  --emerald-dim: rgba(29,158,117,0.12);
-  --emerald-t:   #4ECDA4;
+  --emerald-dim: rgba(29, 158, 117, 0.14);
+  --emerald-t:   #0F6E56;
 
   --amber:       #BA7517;
-  --amber-dim:   rgba(186,117,23,0.12);
-  --amber-t:     #F0A830;
+  --amber-dim:   rgba(186, 117, 23, 0.14);
+  --amber-t:     #854F0B;
 
   --coral:       #D85A30;
-  --coral-dim:   rgba(216,90,48,0.12);
-  --coral-t:     #F07050;
+  --coral-dim:   rgba(216, 90, 48, 0.14);
+  --coral-t:     #99341B;
 
-  /* Identity */
-  --blue:        #378ADD;
-  --blue-dim:    rgba(55,138,221,0.12);
-  --blue-t:      #6AAEE8;
+  /* Primary accent (CTA / shared / links / vivienda) */
+  --blue:      #4B7FFA;
+  --blue-dim:  #E7F4FC;
+  --blue-t:    #3A66D6;
 
-  --pink:        #D4537E;
-  --pink-dim:    rgba(212,83,126,0.12);
-  --pink-t:      #E880A8;
+  /* Identity — Víctor */
+  --victor:     #38BDF8;
+  --victor-dim: #E7F4FC;
+  --victor-t:   #0B7BAE;
 
-  /* Category palette — muted, works on dark bg */
-  --cat-vivienda:        #5B9BD5;
-  --cat-alimentacion:    #4BAE82;
-  --cat-transporte:      #C49538;
-  --cat-salud:           #C45E8F;
-  --cat-entretenimiento: #8B67C4;
-  --cat-suscripciones:   #3BA8BE;
-  --cat-otros:           #787876;
+  /* Identity — Camila */
+  --pink:      #D4537E;
+  --pink-dim:  #F6E1E9;
+  --pink-t:    #B23964;
+
+  /* Category palette — legible on white */
+  --cat-vivienda:         #4B7FFA;
+  --cat-alimentacion:     #8FAF00;
+  --cat-alimentacion-bar: #C9F23D;
+  --cat-transporte:       #D85A30;
+  --cat-salud:            #B23F73;
+  --cat-entretenimiento:  #6D4FC4;
+  --cat-suscripciones:    #1591A8;
+  --cat-otros:            #787876;
 
   /* Radius */
   --r-input:  8px;
@@ -79,7 +98,7 @@ html, body, #root {
   padding: 0;
   background-color: var(--bg0);
   color: var(--t1);
-  font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -94,32 +113,39 @@ html, body, #root {
   overflow-x: hidden;
 }
 
+/* ─── Typography — display (greeting / big title) ────────────── */
+.font-display {
+  font-family: 'Fraunces Variable', 'Fraunces', serif;
+  font-weight: 150;
+  letter-spacing: -0.02em;
+}
+
 /* ─── Typography — UI copy ───────────────────────────────────── */
 .text-base-ui { font-size: 15px; font-weight: 400; letter-spacing: -0.01em; }
 .text-sm-ui   { font-size: 13px; font-weight: 400; letter-spacing: -0.01em; }
 .text-xs-ui   { font-size: 11px; font-weight: 400; }
-.label { font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.09em; }
+.label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.09em; }
 
-/* ─── Typography — financial figures (DM Mono) ───────────────── */
+/* ─── Typography — financial figures ─────────────────────────── */
 .num-hero {
-  font-family: 'DM Mono', ui-monospace, monospace;
-  font-size: 40px; font-weight: 400; letter-spacing: -0.03em; line-height: 1;
+  font-size: 40px; font-weight: 300; letter-spacing: -0.03em; line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 .num-xl {
-  font-family: 'DM Mono', ui-monospace, monospace;
-  font-size: 28px; font-weight: 400; letter-spacing: -0.03em; line-height: 1;
+  font-size: 28px; font-weight: 300; letter-spacing: -0.03em; line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 .num-lg {
-  font-family: 'DM Mono', ui-monospace, monospace;
-  font-size: 22px; font-weight: 400; letter-spacing: -0.02em; line-height: 1;
+  font-size: 22px; font-weight: 300; letter-spacing: -0.03em; line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 .num-md {
-  font-family: 'DM Mono', ui-monospace, monospace;
-  font-size: 15px; font-weight: 400; letter-spacing: -0.01em; line-height: 1;
+  font-size: 15px; font-weight: 300; letter-spacing: -0.02em; line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 .num-sm {
-  font-family: 'DM Mono', ui-monospace, monospace;
-  font-size: 12px; font-weight: 400; letter-spacing: 0; line-height: 1;
+  font-size: 12px; font-weight: 400; letter-spacing: -0.01em; line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ─── Interaction States ─────────────────────────────────────── */
@@ -132,7 +158,7 @@ html, body, #root {
 }
 
 *:focus-visible {
-  outline: 1.5px solid var(--emerald);
+  outline: 1.5px solid var(--blue);
   outline-offset: 2px;
 }
 

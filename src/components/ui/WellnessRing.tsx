@@ -2,7 +2,7 @@ import { motion } from 'motion/react'
 import type { WellnessStatus } from '@/core'
 
 const statusColor: Record<WellnessStatus, string> = {
-  ok:       'var(--emerald)',
+  ok:       'var(--blue)',
   warning:  'var(--amber)',
   critical: 'var(--coral)',
 }
@@ -13,6 +13,8 @@ interface WellnessRingProps {
   size?: number
   strokeWidth?: number
   colorOverride?: string
+  trackColor?: string
+  centerColor?: string
 }
 
 export function WellnessRing({
@@ -21,6 +23,8 @@ export function WellnessRing({
   size = 80,
   strokeWidth = 5.5,
   colorOverride,
+  trackColor = 'var(--s2)',
+  centerColor,
 }: WellnessRingProps) {
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
@@ -37,7 +41,7 @@ export function WellnessRing({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="var(--s2)"
+          stroke={trackColor}
           strokeWidth={strokeWidth}
         />
         {/* Fill */}
@@ -58,7 +62,7 @@ export function WellnessRing({
       {/* Center label */}
       <div
         className="absolute inset-0 flex items-center justify-center num-md"
-        style={{ color }}
+        style={{ color: centerColor ?? color }}
       >
         {Math.round(clampedPct)}%
       </div>

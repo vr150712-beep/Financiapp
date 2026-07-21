@@ -3,31 +3,34 @@ import { motion } from 'motion/react'
 
 interface FABProps {
   onClick: () => void
-  color?: string
   label?: string
 }
 
-export function FAB({ onClick, color, label = 'Agregar' }: FABProps) {
+export function FAB({ onClick, label = 'Agregar' }: FABProps) {
   return (
     <motion.button
       onClick={onClick}
       aria-label={label}
-      className="fixed z-20 flex items-center justify-center btn-press"
+      className="fixed z-20 flex items-center gap-2 btn-press"
       style={{
-        bottom: 72,
+        bottom: 'calc(72px + env(safe-area-inset-bottom))',
         right: 20,
-        width: 52,
         height: 52,
-        borderRadius: '50%',
-        background: color ?? 'var(--blue)',
-        boxShadow: `0 4px 20px ${color ? color + '55' : 'rgba(55,138,221,0.45)'}`,
+        paddingLeft: 18,
+        paddingRight: 22,
+        borderRadius: 999,
+        background: 'var(--t1)',
+        boxShadow: '0 8px 24px rgba(20,20,15,0.25)',
       }}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0, opacity: 0 }}
       transition={{ type: 'spring', stiffness: 400, damping: 28 }}
     >
-      <Plus size={22} color="white" strokeWidth={2.5} />
+      <Plus size={20} color="#fff" strokeWidth={2.5} />
+      <span className="text-sm-ui font-semibold whitespace-nowrap" style={{ color: '#fff' }}>
+        {label}
+      </span>
     </motion.button>
   )
 }

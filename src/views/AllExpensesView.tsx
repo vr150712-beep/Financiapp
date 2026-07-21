@@ -5,7 +5,7 @@ import { ReceiptText } from 'lucide-react'
 import { useExpensesStore, useProfilesStore } from '@/store'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { CATEGORIES } from '@/core'
-import { CATEGORY_COLORS } from '@/components/widgets/DistributionWidget'
+import { CATEGORY_COLORS } from '@/core'
 import { formatCOP } from '@/lib/format'
 import type { Expense } from '@/core'
 

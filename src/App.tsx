@@ -6,18 +6,20 @@ import { Header }       from '@/components/navigation/Header'
 import { BottomNav }    from '@/components/navigation/BottomNav'
 import { FAB }          from '@/components/ui/FAB'
 
-import { IncomeSheet }  from '@/components/sheets/IncomeSheet'
-import { ExpenseSheet } from '@/components/sheets/ExpenseSheet'
-import { ProjectSheet } from '@/components/sheets/ProjectSheet'
-import { SettingsSheet }from '@/components/sheets/SettingsSheet'
+import { IncomeSheet }    from '@/components/sheets/IncomeSheet'
+import { ExpenseSheet }   from '@/components/sheets/ExpenseSheet'
+import { ProjectSheet }   from '@/components/sheets/ProjectSheet'
+import { SettingsSheet }  from '@/components/sheets/SettingsSheet'
+import { AddChoiceSheet } from '@/components/sheets/AddChoiceSheet'
 
 import { HomeView }             from '@/views/HomeView'
-import { AllExpensesView }      from '@/views/AllExpensesView'
+import { ExpensesView }         from '@/views/ExpensesView'
 import { ProjectsView }         from '@/views/ProjectsView'
 import { ProfileSettingsView }  from '@/views/ProfileSettingsView'
 
 import { useProfilesStore } from '@/store'
 import { useGreeting }      from '@/hooks'
+import { getTabConfig }     from '@/app/tabs'
 import type { TabId }       from '@/app/tabs'
 import type { ProfileId }   from '@/core'
 import type { Expense }     from '@/core'
@@ -32,10 +34,11 @@ export default function App() {
   const [editingExpense,    setEditingExpense]      = useState<Expense | null>(null)
   const [projectOpen,       setProjectOpen]        = useState(false)
   const [settingsOpen,      setSettingsOpen]       = useState(false)
+  const [addChoiceOpen,     setAddChoiceOpen]      = useState(false)
 
   const setActiveProfile = useProfilesStore((s) => s.setActiveProfile)
-  const profiles         = useProfilesStore((s) => s.profiles)
   const greeting         = useGreeting()
+  const tabConfig        = getTabConfig(tab)
 
   // Keep the Zustand store in sync with the local profile switcher
   useEffect(() => {
@@ -46,11 +49,9 @@ export default function App() {
     setEditingExpense(null)
     if (tab === 'goals') {
       setProjectOpen(true)
-    } else if (tab === 'expenses') {
-      setExpenseInitShared(false)
-      setExpenseOpen(true)
+    } else if (tab === 'home') {
+      setAddChoiceOpen(true)
     } else {
-      // home
       setExpenseInitShared(false)
       setExpenseOpen(true)
     }
@@ -59,6 +60,17 @@ export default function App() {
   function handleEditExpense(expense: Expense) {
     setEditingExpense(expense)
     setExpenseOpen(true)
+  }
+
+  function handleChooseExpense() {
+    setAddChoiceOpen(false)
+    setExpenseInitShared(false)
+    setExpenseOpen(true)
+  }
+
+  function handleChooseProject() {
+    setAddChoiceOpen(false)
+    setProjectOpen(true)
   }
 
   return (
@@ -76,7 +88,10 @@ export default function App() {
         </div>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto pb-[72px] pt-2">
+        <div
+          className="flex-1 overflow-y-auto pt-2"
+          style={{ paddingBottom: 'calc(72px + env(safe-area-inset-bottom))' }}
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={tab + activeProfileId}
@@ -93,7 +108,7 @@ export default function App() {
                 />
               )}
               {tab === 'expenses' && (
-                <AllExpensesView onEdit={handleEditExpense} />
+                <ExpensesView profileId={activeProfileId} onEdit={handleEditExpense} showSummary />
               )}
               {tab === 'goals' && <ProjectsView />}
               {tab === 'profile' && (
@@ -109,18 +124,13 @@ export default function App() {
         {/* Bottom nav */}
         <BottomNav active={tab} onChange={setTab} />
 
-        {/* Per-section FAB (not on profile tab) */}
+        {/* Per-section FAB */}
         <AnimatePresence>
-          {tab !== 'profile' && (
+          {tabConfig.showFab && (
             <FAB
               key={tab}
               onClick={handleFAB}
-              color={
-                tab === 'goals'
-                  ? 'var(--emerald)'
-                  : profiles[activeProfileId].color
-              }
-              label={tab === 'goals' ? 'Nueva meta' : 'Agregar gasto'}
+              label={tabConfig.fabLabel}
             />
           )}
         </AnimatePresence>
@@ -137,6 +147,12 @@ export default function App() {
       />
       <ProjectSheet  open={projectOpen}  onClose={() => setProjectOpen(false)} />
       <SettingsSheet open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <AddChoiceSheet
+        open={addChoiceOpen}
+        onClose={() => setAddChoiceOpen(false)}
+        onChooseExpense={handleChooseExpense}
+        onChooseProject={handleChooseProject}
+      />
 
       {/* Toasts */}
       <Toaster

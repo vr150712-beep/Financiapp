@@ -1,13 +1,12 @@
-import { useState, useEffect, useCallback } from 'react'
-import { Drawer } from 'vaul'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { X, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react'
 import { useExpensesStore, useProfilesStore } from '@/store'
-import { useSplitRatio, useKeyboardHeight } from '@/hooks'
+import { useSplitRatio, useScrollOnFocus } from '@/hooks'
 import { CATEGORIES, ExpenseSchema, type Category, type ProfileId } from '@/core'
 import { calcSuggestedPart } from '@/core'
 import { formatCOP, formatInputCOP, parseInputCOP } from '@/lib/format'
-import { CATEGORY_COLORS } from '@/components/widgets/DistributionWidget'
+import { SheetShell } from '@/components/ui/SheetShell'
 import type { Expense } from '@/core'
 
 // Top N categories shown by default before "ver más"
@@ -45,7 +44,6 @@ export function ExpenseSheet({
   const profiles      = useProfilesStore((s) => s.profiles)
 
   const { victorRatio, partnerRatio } = useSplitRatio()
-  const kbH = useKeyboardHeight()
   const effectiveOwner = isEditing ? editingExpense.ownerId : ownerId
   const ratio          = effectiveOwner === 'victor' ? victorRatio : partnerRatio
 
@@ -139,24 +137,16 @@ export function ExpenseSheet({
   const ownerProfile = profiles[effectiveOwner]
 
   // Scroll focused input into view once keyboard finishes animating
-  const scrollOnFocus = useCallback((e: { currentTarget: HTMLInputElement }) => {
-    const el = e.currentTarget
-    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 320)
-  }, [])
+  const scrollOnFocus = useScrollOnFocus()
+
+  const isValid =
+    label.trim().length >= 2 &&
+    numAmount > 0 &&
+    (!shared || (numMyPart > 0 && numMyPart <= numAmount))
 
   return (
-    <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()}>
-      <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/55 z-40" />
-        <Drawer.Content
-          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-[var(--s1)] rounded-t-[16px] outline-none"
-          style={{ bottom: kbH, transition: 'bottom 0.25s ease-out' }}
-        >
-          {/* Handle */}
-          <div className="w-8 h-[3px] bg-[var(--s3)] rounded-full mx-auto mt-2.5 mb-1" />
-
-          <div className="px-4 pb-8 overflow-y-auto" style={{ maxHeight: `calc(92dvh - ${kbH}px)` }}>
-            {/* Header */}
+    <SheetShell open={open} onClose={onClose}>
+      {/* Header */}
             <div className="flex items-center justify-between py-3">
               <div className="flex items-center gap-2">
                 <div
@@ -296,15 +286,13 @@ export function ExpenseSheet({
             {/* ── CTA ── */}
             <button
               onClick={handleSave}
+              disabled={!isValid}
               className="w-full text-white rounded-lg py-3.5 text-sm-ui font-semibold btn-press mt-1"
-              style={{ backgroundColor: ownerProfile.color }}
+              style={{ backgroundColor: 'var(--t1)' }}
             >
               {isEditing ? 'Guardar cambios' : 'Guardar gasto'}
             </button>
-          </div>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+    </SheetShell>
   )
 }
 
@@ -314,8 +302,7 @@ function CategoryPill({ catKey, active, onSelect }: {
   active: boolean
   onSelect: () => void
 }) {
-  const cat   = CATEGORIES[catKey]
-  const color = CATEGORY_COLORS[catKey] ?? 'var(--cat-otros)'
+  const cat = CATEGORIES[catKey]
 
   return (
     <button
@@ -323,7 +310,7 @@ function CategoryPill({ catKey, active, onSelect }: {
       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs-ui font-medium btn-press transition-all"
       style={
         active
-          ? { background: color + '33', border: `1px solid ${color}66`, color }
+          ? { background: 'var(--t1)', border: '1px solid var(--t1)', color: '#fff' }
           : { background: 'var(--s2)', border: '1px solid transparent', color: 'var(--t2)' }
       }
     >

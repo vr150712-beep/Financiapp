@@ -1,8 +1,8 @@
-import { WellnessWidget }     from '@/components/widgets/WellnessWidget'
-import { DistributionWidget } from '@/components/widgets/DistributionWidget'
-import { ExpensesView }       from '@/views/ExpensesView'
-import type { ProfileId }     from '@/core'
-import type { Expense }       from '@/core'
+import { WellnessWidget } from '@/components/widgets/WellnessWidget'
+import { HouseWidget }    from '@/components/widgets/HouseWidget'
+import { ExpensesView }   from '@/views/ExpensesView'
+import type { ProfileId } from '@/core'
+import type { Expense }   from '@/core'
 
 interface HomeViewProps {
   activeProfileId: ProfileId
@@ -19,7 +19,7 @@ export function HomeView({ activeProfileId, onEdit, onAddIncome }: HomeViewProps
           profileName=""   /* name shown in header, not repeated in widget */
           onAddIncome={onAddIncome}
         />
-        <DistributionWidget profileId={activeProfileId} />
+        <HouseWidget />
       </div>
 
       <ExpensesView profileId={activeProfileId} onEdit={onEdit} />

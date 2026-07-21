@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
-import { Drawer } from 'vaul'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { X } from 'lucide-react'
 import { useProjectsStore } from '@/store'
-import { useSplitRatio, useKeyboardHeight } from '@/hooks'
+import { useSplitRatio, useScrollOnFocus } from '@/hooks'
 import { ProjectSchema } from '@/core'
-import { formatCOP } from '@/lib/format'
+import { formatCOP, formatInputCOP, parseInputCOP } from '@/lib/format'
+import { SheetShell } from '@/components/ui/SheetShell'
 
 interface ProjectSheetProps {
   open: boolean
@@ -20,16 +20,12 @@ export function ProjectSheet({ open, onClose }: ProjectSheetProps) {
 
   const addProject = useProjectsStore((s) => s.addProject)
   const { victorRatio, partnerRatio } = useSplitRatio()
-  const kbH = useKeyboardHeight()
+  const scrollOnFocus = useScrollOnFocus()
 
-  const scrollOnFocus = useCallback((e: { currentTarget: HTMLInputElement }) => {
-    const el = e.currentTarget
-    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 320)
-  }, [])
-
-  const numAmount = parseFloat(amount) || 0
+  const numAmount = parseInputCOP(amount) || 0
   const numMonths = parseInt(months)   || 0
   const showPreview = numAmount > 0 && numMonths > 0
+  const isValid = label.trim().length >= 2 && numAmount > 0 && numMonths >= 1 && numMonths <= 120
 
   useEffect(() => {
     if (open) {
@@ -61,16 +57,7 @@ export function ProjectSheet({ open, onClose }: ProjectSheetProps) {
   }
 
   return (
-    <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()}>
-      <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/55 z-40" />
-        <Drawer.Content
-          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-[var(--s1)] rounded-sheet rounded-b-none outline-none"
-          style={{ bottom: kbH, transition: 'bottom 0.25s ease-out' }}
-        >
-          <div className="w-8 h-[3px] bg-[var(--s3)] rounded-full mx-auto mt-2.5 mb-1" />
-
-          <div className="px-4 pb-8 overflow-y-auto" style={{ maxHeight: `calc(88dvh - ${kbH}px)` }}>
+    <SheetShell open={open} onClose={onClose}>
             <div className="flex items-center justify-between py-3">
               <h2 className="text-base-ui font-semibold text-[var(--t1)]">Nuevo proyecto</h2>
               <button onClick={onClose} className="text-[var(--t3)]"><X size={20} strokeWidth={1.5} /></button>
@@ -95,11 +82,11 @@ export function ProjectSheet({ open, onClose }: ProjectSheetProps) {
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--t3)]">$</span>
                   <input
-                    inputMode="decimal"
+                    inputMode="numeric"
                     pattern="[0-9]*"
                     placeholder="0"
                     value={amount}
-                    onChange={(e) => { setAmount(e.target.value.replace(/[^0-9.]/g, '')); setErrors((er) => ({ ...er, amount: '' })) }}
+                    onChange={(e) => { setAmount(formatInputCOP(e.target.value)); setErrors((er) => ({ ...er, amount: '' })) }}
                     onFocus={scrollOnFocus}
                     className="w-full bg-[var(--s2)] border border-[var(--s3)] rounded-input pl-7 pr-3 py-3 text-sm-ui text-[var(--t1)] placeholder:text-[var(--t3)] focus:outline-none focus:ring-[1.5px] focus:ring-[var(--emerald)]"
                   />
@@ -140,14 +127,12 @@ export function ProjectSheet({ open, onClose }: ProjectSheetProps) {
 
               <button
                 onClick={handleSave}
-                className="w-full bg-[var(--blue)] text-white rounded-input py-3.5 text-sm-ui font-medium btn-press mt-1"
+                disabled={!isValid}
+                className="w-full bg-[var(--t1)] text-white rounded-input py-3.5 text-sm-ui font-medium btn-press mt-1"
               >
                 Crear proyecto
               </button>
             </div>
-          </div>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+    </SheetShell>
   )
 }

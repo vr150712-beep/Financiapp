@@ -21,7 +21,7 @@ const defaultProfiles: Record<ProfileId, Profile> = {
     id: 'victor',
     name: 'Víctor',
     savings: 0,
-    color: '#378ADD',
+    color: '#38BDF8',
     sources: [],
   },
   partner: {

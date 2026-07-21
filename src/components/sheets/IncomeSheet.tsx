@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { Drawer } from 'vaul'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { X, Trash2, Plus, ChevronUp } from 'lucide-react'
 import { useProfilesStore } from '@/store'
 import { selectProfileIncome } from '@/store'
 import { IncomeSourceSchema } from '@/core'
-import { formatCOP, parseInputCOP } from '@/lib/format'
-import { useKeyboardHeight } from '@/hooks'
+import { formatCOP, formatInputCOP, parseInputCOP } from '@/lib/format'
+import { useScrollOnFocus } from '@/hooks'
+import { SheetShell } from '@/components/ui/SheetShell'
 import type { ProfileId } from '@/core'
 
 interface IncomeSheetProps {
@@ -28,12 +28,19 @@ export function IncomeSheet({ open, onClose }: IncomeSheetProps) {
   const profiles    = useProfilesStore((s) => s.profiles)
   const addSource   = useProfilesStore((s) => s.addIncomeSource)
   const removeSource= useProfilesStore((s) => s.removeIncomeSource)
-  const kbH         = useKeyboardHeight()
+  const scrollOnFocus = useScrollOnFocus()
 
   const [forms, setForms] = useState<Record<ProfileId, PersonFormState>>({
     victor:  { ...EMPTY_FORM },
     partner: { ...EMPTY_FORM },
   })
+
+  // Reset any abandoned in-progress "new source" entry each time the sheet opens
+  useEffect(() => {
+    if (open) {
+      setForms({ victor: { ...EMPTY_FORM }, partner: { ...EMPTY_FORM } })
+    }
+  }, [open])
 
   const victorIncome  = selectProfileIncome(profiles.victor)
   const partnerIncome = selectProfileIncome(profiles.partner)
@@ -50,7 +57,7 @@ export function IncomeSheet({ open, onClose }: IncomeSheetProps) {
     const parsed = IncomeSourceSchema.safeParse({
       id: crypto.randomUUID(),
       name: f.name.trim(),
-      amount: parseFloat(f.amount),
+      amount: parseInputCOP(f.amount),
     })
 
     if (!parsed.success) {
@@ -70,18 +77,8 @@ export function IncomeSheet({ open, onClose }: IncomeSheetProps) {
   }
 
   return (
-    <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()}>
-      <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/55 z-40" />
-        <Drawer.Content
-          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-[var(--s1)] rounded-t-[16px] outline-none"
-          style={{ bottom: kbH, transition: 'bottom 0.25s ease-out' }}
-        >
-          {/* Handle */}
-          <div className="w-8 h-[3px] bg-[var(--s3)] rounded-full mx-auto mt-2.5 mb-1" />
-
-          <div className="px-4 pb-8 overflow-y-auto" style={{ maxHeight: `calc(88dvh - ${kbH}px)` }}>
-            {/* Header */}
+    <SheetShell open={open} onClose={onClose}>
+      {/* Header */}
             <div className="flex items-center justify-between py-3 mb-1">
               <div>
                 <h2 className="text-base-ui font-semibold text-[var(--t1)]">Ingresos del hogar</h2>
@@ -131,6 +128,7 @@ export function IncomeSheet({ open, onClose }: IncomeSheetProps) {
               onFormChange={(patch) => setForm('victor', patch)}
               onAdd={() => handleAdd('victor')}
               onRemove={(sid) => handleRemove('victor', sid)}
+              onFocus={scrollOnFocus}
             />
 
             <div className="h-3" />
@@ -144,6 +142,7 @@ export function IncomeSheet({ open, onClose }: IncomeSheetProps) {
               onFormChange={(patch) => setForm('partner', patch)}
               onAdd={() => handleAdd('partner')}
               onRemove={(sid) => handleRemove('partner', sid)}
+              onFocus={scrollOnFocus}
             />
 
             <button
@@ -152,10 +151,7 @@ export function IncomeSheet({ open, onClose }: IncomeSheetProps) {
             >
               Listo
             </button>
-          </div>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+    </SheetShell>
   )
 }
 
@@ -168,9 +164,10 @@ interface PersonSectionProps {
   onFormChange: (patch: Partial<PersonFormState>) => void
   onAdd: () => void
   onRemove: (sourceId: string) => void
+  onFocus: (e: { currentTarget: HTMLInputElement }) => void
 }
 
-function PersonSection({ id, profile, income, form, onFormChange, onAdd, onRemove }: PersonSectionProps) {
+function PersonSection({ id, profile, income, form, onFormChange, onAdd, onRemove, onFocus }: PersonSectionProps) {
   return (
     <div className="bg-[var(--s2)] rounded-xl overflow-hidden">
       {/* Person header */}
@@ -239,6 +236,7 @@ function PersonSection({ id, profile, income, form, onFormChange, onAdd, onRemov
               placeholder="Nombre (ej. Salario)"
               value={form.name}
               onChange={(e) => onFormChange({ name: e.target.value, errors: { ...form.errors, name: undefined } })}
+              onFocus={onFocus}
               className="w-full bg-[var(--s3)] rounded-lg px-3 py-2.5 text-sm-ui text-[var(--t1)] placeholder:text-[var(--t3)] focus:outline-none focus:ring-[1.5px] focus:ring-[var(--emerald)]"
             />
             {form.errors.name && <p className="text-xs-ui text-[var(--coral-t)]">{form.errors.name}</p>}
@@ -246,11 +244,12 @@ function PersonSection({ id, profile, income, form, onFormChange, onAdd, onRemov
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--t3)] text-sm-ui">$</span>
               <input
-                inputMode="decimal"
+                inputMode="numeric"
                 pattern="[0-9]*"
                 placeholder="0"
                 value={form.amount}
-                onChange={(e) => onFormChange({ amount: e.target.value.replace(/[^0-9.]/g, ''), errors: { ...form.errors, amount: undefined } })}
+                onChange={(e) => onFormChange({ amount: formatInputCOP(e.target.value), errors: { ...form.errors, amount: undefined } })}
+                onFocus={onFocus}
                 className="w-full bg-[var(--s3)] rounded-lg pl-7 pr-3 py-2.5 text-sm-ui text-[var(--t1)] placeholder:text-[var(--t3)] focus:outline-none focus:ring-[1.5px] focus:ring-[var(--emerald)]"
               />
             </div>
@@ -258,7 +257,8 @@ function PersonSection({ id, profile, income, form, onFormChange, onAdd, onRemov
 
             <button
               onClick={onAdd}
-              className="w-full bg-[var(--blue)] text-white rounded-lg py-2.5 text-sm-ui font-medium btn-press mt-1"
+              disabled={form.name.trim().length < 2 || parseInputCOP(form.amount) <= 0}
+              className="w-full bg-[var(--t1)] text-white rounded-lg py-2.5 text-sm-ui font-medium btn-press mt-1"
             >
               Guardar
             </button>

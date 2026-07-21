@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { Drawer } from 'vaul'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { X } from 'lucide-react'
 import { useProfilesStore } from '@/store'
+import { useScrollOnFocus } from '@/hooks'
+import { SheetShell } from '@/components/ui/SheetShell'
 
 interface SettingsSheetProps {
   open: boolean
@@ -13,11 +14,25 @@ export function SettingsSheet({ open, onClose }: SettingsSheetProps) {
   const profiles = useProfilesStore((s) => s.profiles)
   const updateName    = useProfilesStore((s) => s.updateProfileName)
   const updateSavings = useProfilesStore((s) => s.updateSavingsTarget)
+  const scrollOnFocus = useScrollOnFocus()
 
   const [victorName,    setVictorName]    = useState(profiles.victor.name)
   const [partnerName,   setPartnerName]   = useState(profiles.partner.name)
   const [victorSavings, setVictorSavings] = useState(String(profiles.victor.savings || ''))
   const [partnerSavings,setPartnerSavings]= useState(String(profiles.partner.savings || ''))
+
+  // Resync fields with the store each time the sheet opens, discarding any
+  // stale edits left over from a previous open that was dismissed unsaved
+  useEffect(() => {
+    if (open) {
+      setVictorName(profiles.victor.name)
+      setPartnerName(profiles.partner.name)
+      setVictorSavings(String(profiles.victor.savings || ''))
+      setPartnerSavings(String(profiles.partner.savings || ''))
+    }
+  }, [open]) // profiles intentionally omitted — only resync on open, not on every store update
+
+  const isValid = victorName.trim().length >= 2 && partnerName.trim().length >= 2
 
   function handleSave() {
     if (victorName.trim().length >= 2) updateName('victor', victorName.trim())
@@ -29,12 +44,7 @@ export function SettingsSheet({ open, onClose }: SettingsSheetProps) {
   }
 
   return (
-    <Drawer.Root open={open} onOpenChange={(v) => !v && onClose()}>
-      <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/55 z-40" />
-        <Drawer.Content className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 bg-[var(--s1)] rounded-sheet rounded-b-none outline-none">
-          <div className="w-8 h-[3px] bg-[var(--s3)] rounded-full mx-auto mt-2.5 mb-1" />
-          <div className="px-4 pb-8">
+    <SheetShell open={open} onClose={onClose}>
             <div className="flex items-center justify-between py-3">
               <h2 className="text-base-ui font-semibold text-[var(--t1)]">Configuración</h2>
               <button onClick={onClose} className="text-[var(--t3)]"><X size={20} strokeWidth={1.5} /></button>
@@ -54,6 +64,7 @@ export function SettingsSheet({ open, onClose }: SettingsSheetProps) {
                       placeholder="Nombre"
                       value={name as string}
                       onChange={(e) => (setName as (v: string) => void)(e.target.value)}
+                      onFocus={scrollOnFocus}
                       className="w-full bg-[var(--s3)] border border-[var(--s3)] rounded-input px-3 py-2.5 text-sm-ui text-[var(--t1)] placeholder:text-[var(--t3)] focus:outline-none focus:ring-[1.5px] focus:ring-[var(--emerald)]"
                     />
                     <div className="relative">
@@ -63,6 +74,7 @@ export function SettingsSheet({ open, onClose }: SettingsSheetProps) {
                         placeholder="Meta de ahorro mensual"
                         value={savings as string}
                         onChange={(e) => (setSavings as (v: string) => void)(e.target.value.replace(/[^0-9.]/g, ''))}
+                        onFocus={scrollOnFocus}
                         className="w-full bg-[var(--s3)] border border-[var(--s3)] rounded-input pl-7 pr-3 py-2.5 text-sm-ui text-[var(--t1)] placeholder:text-[var(--t3)] focus:outline-none focus:ring-[1.5px] focus:ring-[var(--emerald)]"
                       />
                     </div>
@@ -72,14 +84,12 @@ export function SettingsSheet({ open, onClose }: SettingsSheetProps) {
 
               <button
                 onClick={handleSave}
-                className="w-full bg-[var(--blue)] text-white rounded-input py-3.5 text-sm-ui font-medium btn-press"
+                disabled={!isValid}
+                className="w-full bg-[var(--t1)] text-white rounded-input py-3.5 text-sm-ui font-medium btn-press"
               >
                 Guardar configuración
               </button>
             </div>
-          </div>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+    </SheetShell>
   )
 }

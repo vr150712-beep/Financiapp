@@ -1,5 +1,4 @@
 import { WellnessWidget }     from '@/components/widgets/WellnessWidget'
-import { DistributionWidget } from '@/components/widgets/DistributionWidget'
 import { ExpensesView }       from '@/views/ExpensesView'
 import { useProfilesStore }   from '@/store'
 import type { ProfileId }     from '@/core'
@@ -23,7 +22,6 @@ export function ProfileView({ profileId, onAddIncome, onEdit }: ProfileViewProps
           profileName={profile.name}
           onAddIncome={onAddIncome}
         />
-        <DistributionWidget profileId={profileId} />
       </div>
 
       {/* Expense list — manages its own px-4 */}
