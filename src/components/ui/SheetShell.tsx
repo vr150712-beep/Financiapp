@@ -18,7 +18,7 @@ export function SheetShell({ open, onClose, children }: SheetShellProps) {
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/55 z-40" />
         <Drawer.Content
-          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] z-50 rounded-sheet rounded-b-none outline-none"
+          className="fixed bottom-0 left-0 right-0 w-full z-50 rounded-sheet rounded-b-none outline-none"
           style={{ bottom: kbH, transition: 'bottom 0.25s ease-out', backgroundColor: 'var(--s1)' }}
         >
           <div className="w-8 h-[3px] rounded-full mx-auto mt-2.5 mb-1" style={{ backgroundColor: 'var(--s3)' }} />
