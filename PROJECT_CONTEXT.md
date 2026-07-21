@@ -8,6 +8,8 @@
 
 A private, two-person finance tracker PWA for Víctor and Camila. It is **not a ledger** — there are no dates, no payment states. It's a static monthly snapshot of cash flow (personal + shared) that computes a "wellness" score per person: how much of your income is left after your personal and shared burden.
 
+Data syncs across devices via Supabase (see `supabase/schema.sql`), gated by a shared PIN (`src/components/PinGate.tsx`).
+
 ### Core product decisions
 
 - **Shared expenses (Model B)**: a shared expense doesn't belong to a profile, it belongs to the household. It's stored once — `ownerId` (who logged it), `myPart`, `otherPart` (`amount - myPart`). No duplication across profiles.
