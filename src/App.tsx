@@ -18,7 +18,7 @@ import { ProjectsView }         from '@/views/ProjectsView'
 import { ProfileSettingsView }  from '@/views/ProfileSettingsView'
 
 import { useProfilesStore } from '@/store'
-import { useGreeting }      from '@/hooks'
+import { useGreeting, useSupabaseSync } from '@/hooks'
 import { getTabConfig }     from '@/app/tabs'
 import type { TabId }       from '@/app/tabs'
 import type { ProfileId }   from '@/core'
@@ -39,6 +39,8 @@ export default function App() {
   const setActiveProfile = useProfilesStore((s) => s.setActiveProfile)
   const greeting         = useGreeting()
   const tabConfig        = getTabConfig(tab)
+
+  useSupabaseSync()
 
   // Keep the Zustand store in sync with the local profile switcher
   useEffect(() => {
